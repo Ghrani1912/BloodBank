@@ -1,0 +1,615 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Webcrumbs Plugin</title>
+    <link
+      rel="stylesheet"
+      href="{% static 'blood_request.css' %}">
+    <link
+      rel="stylesheet"
+      href="{% static 'normal_home.css' %}">
+  </head>
+  
+  <body onload="updateTime()"> 
+    <div id="webcrumbs">
+      <div class="flex flex-col min-h-screen bg-gray-50" >
+        <header class="bg-white shadow-lg p-4" style="border-radius: 30px;">
+          <nav class="container mx-auto flex justify-between items-center" >
+            <div class="flex items-center space-x-2 hover:scale-105 transition-transform duration-300"> 
+              <span class="material-symbols-outlined text-red-600 text-3xl animate-pulse">bloodtype</span>
+               <h1 class="text-2xl font-bold text-red-600">RedRespond</h1> </div> 
+            <div class="flex items-center space-x-6">
+              <div class="flex items-center space-x-2">
+                <span class="material-symbols-outlined text-red-500"
+                  >schedule</span>
+                <span class="text-sm"><span id="time"></span> <span id="date"></span></span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="material-symbols-outlined text-red-500"
+                  >person</span
+                >
+                <span>&nbsp;Hello, {{request.user.username}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span
+                  class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-sm"
+                  >{{blood_groupiee.blood_group}}</span
+                >
+              </div>
+              <a href="{% url 'blood_bank_search' %}">
+                <button
+                  class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 flex items-center space-x-2"
+                >
+                  <span class="material-symbols-outlined mr-2">search</span>
+                  Search
+                </button></a>
+                <a href="{% url 'view_profile' %}">
+                  <button
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 flex items-center space-x-2"
+                  >
+                    <span class="material-symbols-outlined mr-2">person</span>
+                    Profile
+                  </button></a>
+              <a href="{% url 'logout' %}">
+              <button
+                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 flex items-center space-x-2"
+              >
+                <span class="material-symbols-outlined mr-2">logout</span>
+                Logout
+              </button></a>
+            </div>
+          </nav>
+        </header>
+        <main class="flex-grow container mx-auto p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div
+              class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            >
+            <h2
+              class="text-3xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-8"
+            >
+              Schedule Blood Donation
+            </h2>
+            <form class="space-y-6" method="post">
+              {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <label class="block  font-medium" for="blood_group"
+                  >Blood Type</label
+                  >
+                  <select 
+                  name="blood_group"
+                  id="blood_group"
+                  class="w-full p-3  border border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100 outline-none transition-all duration-300"
+                  required
+                  >
+                  <option value="">Select Blood Type</option>
+                  <option value="A+" {% if blood_groupiee.blood_group == "A+" %}selected{% endif %}>A+</option>
+                  <option value="A-" {% if blood_groupiee.blood_group == "A-" %}selected{% endif %}>A-</option>
+                  <option value="B+" {% if blood_groupiee.blood_group == "B+" %}selected{% endif %}>B+</option>
+                  <option value="B-" {% if blood_groupiee.blood_group == "B-" %}selected{% endif %}>B-</option>
+                  <option value="AB+" {% if blood_groupiee.blood_group == "AB+" %}selected{% endif %}>AB+</option>
+                  <option value="AB-" {% if blood_groupiee.blood_group == "AB-" %}selected{% endif %}>AB-</option>
+                  <option value="O+" {% if blood_groupiee.blood_group == "O+" %}selected{% endif %}>O+</option>
+                  <option value="O-" {% if blood_groupiee.blood_group == "O-" %}selected{% endif %}>O-</option>
+                  </select>
+                  {% if form.blood_group.errors %}
+                  {% for error in form.blood_group.errors %}
+                  <p class="text-red-500 text-sm">{{ error }}</p>
+                  {% endfor %}
+                  {% endif %}
+                </div>
+                <div class="space-y-2">
+                  <label class="block  font-medium" for="id_scheduled_datetime"
+                    >Preferred Date And Time</label
+                  >
+                  {{ form.scheduled_datetime }}
+                {% for error in form.scheduled_datetime.errors %}
+                    <p class="text-red-500">{{ error }}</p>
+                {% endfor %}
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block  font-medium" for="id_donated_amount"
+                    >Amount to be Donated ( ml )</label
+                  >
+                  {{ form.donated_amount }}
+                {% for error in form.scheduled_datetime.errors %}
+                    <p class="text-red-500">{{ error }}</p>
+                {% endfor %}
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block  font-medium" for = "id_blood_bank"
+                    >Blood Bank Name</label
+                  >
+                  {{ form.blood_bank }}
+                  {% for error in form.blood_bank.errors %}
+                      <p class="text-red-500">{{ error }}</p>
+                  {% endfor %}
+                  {% comment %} <select
+                    class="w-full p-3 rounded-xl border border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100 outline-none transition-all duration-300"
+                  >
+                    <option>Select Location</option>
+                    <option>Central Blood Bank</option>
+                    <option>City Hospital Blood Bank</option>
+                    <option>Regional Medical Center</option>
+                    <option>Community Blood Center</option>
+                  </select> {% endcomment %}
+                </div>
+              </div>
+                <div class="space-y-2">
+                <label class="block font-medium" for="id_additional_info"
+                  >Additional Notes</label
+                >
+                {{ form.additional_info }}
+                {% for error in form.additional_info.errors %}
+                  <p class="text-red-500">{{ error }}</p>
+                {% endfor %}
+                </div>
+              <div
+                class="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-xl"
+              >
+                <h3 class="text-lg font-semibold mb-2">
+                  Important Information
+                </h3>
+                <ul class="list-disc list-inside space-y-1 ">
+                  <li>Must be at least 18 years old</li>
+                  <li>Minimum weight of 50kg</li>
+                  <li>Get adequate rest and eat before donation</li>
+                  <li>Bring valid ID proof</li>
+                  <li>If Prior Donation , then donate after 3 months only</li>
+                </ul>
+              </div>
+              {% if eligible == "True"%}
+              <button
+                class="w-full py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-medium hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+              >
+                Schedule Donation
+              </button>
+              {% else %}
+              <div
+                class="w-full py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-medium hover:shadow-lg hover:scale-[1.02] transition-all duration-300 items-center space-x-2"
+                style="text-align: center;"
+              >
+              <span class="material-symbols-outlined  select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;" 
+              >error</span>
+              Not eligible for donation <br>
+              Can do Donation after {{ eligible_time }} days only.
+            </div>
+              {% endif %}
+              
+            </form>
+             
+            </div> 
+            <div
+              class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            >
+              <h2 class="text-3xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-8">Past Donations</h2>
+                <div class="space-y-4" style="height: 200px; overflow-y: auto;">
+                {% if already %}
+                {% for donation in already %}
+                <div
+                  class="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                  onclick="window.location.href='{% url 'blood_donation_page' donation.id %}'"
+                >
+                  <div class="flex justify-between items-center">
+                  <div class="flex items-center">
+                  <span class="material-symbols-outlined text-red-500 select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;"
+                  >favorite</span
+                  >
+                  <span class="ml-2 font-medium ">&nbsp;Blood Type: &nbsp;&nbsp;&nbsp;&nbsp;<span class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-sm">{{ blood_groupiee.blood_group}}</span></span>
+                  </div>
+                  <span class="text-sm ">{{ donation.scheduled_datetime|date:"Y-m-d H:i"}}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                  <p class="mt-2 text-sm   font-semibold">
+                   &nbsp;&nbsp;{{ donation.blood_bank.organization_name|upper }} BLOOD BANK
+                  </p>
+                  <div class="flex items-center">
+                  <p class="mt-2 text-sm   font-semibold">
+                  &nbsp;&nbsp; Donated Amount : {{ donation.donated_amount }} ml
+                  </p>
+                  <span class=" mt-2 material-symbols-outlined text-red-500 select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;"
+                  >water_drop</span
+                  >
+                </div>
+                  </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class=" font-semibold">No past donations</p>
+                {% endif %}
+                
+                </div>
+             
+                <div class="mt-6">
+                  <hr>
+                <h3 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-8 mt-8">Donation Statistics</h3>
+                <div class="grid grid-cols-2 gap-4">
+                  <div
+                  class="bg-red-50 p-4 rounded-lg text-center hover:bg-red-100 transition-colors"
+                  >
+                  <p class="total_donations text-2xl font-bold "></p>
+                  <p class="text-md ">Total Donations</p>
+                  </div>
+                  <div
+                  class="bg-red-50 p-4 rounded-lg text-center hover:bg-red-100 transition-colors"
+                  >
+                  <p class="total_volume text-2xl font-bold "></p>
+                  <p class="text-md">Total Volume</p>
+                  </div>
+                </div>
+                </div>
+                <script>
+                  document.addEventListener('DOMContentLoaded', function() {
+                    let totalDonations = 0;
+                    let totalVolume = 0;
+                    let donationDate;
+                    let currentDate;
+                    {% for donation in already %}
+                       donationDate = new Date("{{ donation.scheduled_datetime|date:'Y-m-d H:i:s' }}");
+                      currentDate = new Date(); // Get current date and time directly from JavaScript
+                      if (donationDate <= currentDate) {
+                        totalDonations++;
+                        totalVolume += {{ donation.donated_amount }};
+                      }
+                    {% endfor %}
+                    document.querySelector('.total_donations').textContent = totalDonations;
+                    document.querySelector('.total_volume').textContent = totalVolume + 'ml';
+                  });
+                  </script>
+                <div class="mt-8">
+                <h3 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-8">Donation History Chart</h3>
+                <canvas id="donationChart" width="400" height="200"></canvas>
+                </div>
+
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  const ctx = document.getElementById('donationChart').getContext('2d');
+                  const currentDate = new Date();
+                  
+                  let dates = [];
+                  let amounts = [];
+                  let donationDate;
+                  
+                  {% for donation in already %}
+                  donationDate = new Date("{{ donation.scheduled_datetime|date:'Y-m-d H:i:s' }}");
+                  if (donationDate <= currentDate) {
+                    dates.push('{{ donation.scheduled_datetime|date:"Y-m-d" }}');
+                    amounts.push({{ donation.donated_amount }});
+                  }
+                  {% endfor %}
+
+                  new Chart(ctx, {
+                  type: 'bar',
+                  data: {
+                    labels: dates,
+                    datasets: [{
+                    label: 'Donation Amount (ml)',
+                    data: amounts,
+                    backgroundColor: 'rgba(239, 68, 68, 0.5)',
+                    borderColor: 'rgb(239, 68, 68)',
+                    borderWidth: 1
+                    }]
+                  },
+                  options: {
+                    responsive: true,
+                    scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                      display: true,
+                      text: 'Amount (ml)',
+                      font: {
+                        size: 16,
+                        weight: 'bold',
+                        color: 'black'
+                        }
+                      }
+                    },
+                    x: {
+                      title: {
+                      display: true,
+                      text: 'Date',
+                      font: {
+                      size: 16,
+                      weight: 'bold',
+                      color: 'black'
+                      }
+                      }
+                    }
+                    }
+                  }
+                  });
+                });
+                </script>
+              </div>
+          
+            <div
+              class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            >
+              <h2 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-8">Pending Donations</h2>
+              <div class="space-y-4" style="height: 200px; overflow-y: auto;">
+              {% if pending %}
+              {% for donation in pending %}
+              <div
+                class="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                onclick="window.location.href='{% url 'blood_donation_page' donation.id %}'"
+              >
+                <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                <span class="material-symbols-outlined text-red-500 select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;"
+                >favorite</span
+                >
+                <span class="ml-2 font-medium">&nbsp;Blood Type: &nbsp;&nbsp;&nbsp;&nbsp;<span class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-sm">{{ blood_groupiee.blood_group}}</span></span>
+                </div>
+                <span class="text-sm ">{{ donation.scheduled_datetime|date:"Y-m-d H:i"}}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                <p class="mt-2 text-sm   font-semibold">
+                 &nbsp;&nbsp;{{ donation.blood_bank.organization_name|upper }} BLOOD BANK
+                </p>
+                <div class="flex items-center">
+                <p class="mt-2 text-sm   font-semibold">
+                  &nbsp;&nbsp; Donated Amount : {{ donation.donated_amount }} ml
+                </p>
+                  <span class=" mt-2 material-symbols-outlined text-red-500 select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;"
+                >water_drop</span
+                >
+                </div>
+                </div>
+              </div>
+              {% endfor %}
+              {% else %}
+              <p class=" font-semibold">No pending donations</p>
+              {% endif %}
+              </div>
+              </div>
+              <div
+              class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            >
+              <h2 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-8">Not Confirmed</h2>
+              <div class="space-y-4" style="height: 200px; overflow-y: auto;">
+                {% if notconfirm%}
+              {% for donation in notconfirm %}
+              <div
+                class="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                onclick="window.location.href='{% url 'blood_donation_page' donation.id %}'"
+              >
+                <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                <span class="material-symbols-outlined text-red-500 select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;"
+                >favorite</span
+                >
+                <span class="ml-2 font-medium">&nbsp;Blood Type: &nbsp;&nbsp;&nbsp;&nbsp;<span class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-sm">{{ blood_groupiee.blood_group}}</span></span>
+                </div>
+                <span class="text-sm ">{{ donation.scheduled_datetime|date:"Y-m-d H:i"}}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                <p class="mt-2 text-sm   font-semibold">
+                 &nbsp;&nbsp;{{ donation.blood_bank.organization_name|upper }} BLOOD BANK
+                </p>
+                <div class="flex items-center">
+                <p class="mt-2 text-sm   font-semibold">
+                &nbsp;&nbsp; Donated Amount : {{ donation.donated_amount }} ml  
+                </p>
+                <span class=" mt-2 material-symbols-outlined text-red-500 select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;"
+                >water_drop</span
+                >
+                </div>
+                </div>
+              </div>
+              {% endfor %}
+              {% else %}
+              <p class=" font-semibold">No pending donations</p>
+              {% endif %}
+              
+              </div>
+          </div>
+          <div
+              class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            >
+              <h2 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-8">Not Accepted</h2>
+              <div class="space-y-4" style="height: 200px; overflow-y: auto;">
+                {% if not_accepted%}
+              {% for donation in not_accepted %}
+              <div
+                class="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                onclick="window.location.href='{% url 'blood_donation_page' donation.id %}'"
+              >
+                <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                <span class="material-symbols-outlined text-red-500 select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;"
+                >favorite</span
+                >
+                <span class="ml-2 font-medium">&nbsp;Blood Type: &nbsp;&nbsp;&nbsp;&nbsp;<span class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-sm">{{ blood_groupiee.blood_group}}</span></span>
+                </div>
+                <span class="text-sm ">{{ donation.scheduled_datetime|date:"Y-m-d H:i"}}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                <p class="mt-2 text-sm   font-semibold">
+                 &nbsp;&nbsp;{{ donation.blood_bank.organization_name|upper }} BLOOD BANK
+                </p>
+                <div class="flex items-center">
+                <p class="mt-2 text-sm   font-semibold">
+                &nbsp;&nbsp; Donated Amount : {{ donation.donated_amount }} ml  
+                </p>
+                <span class=" mt-2 material-symbols-outlined text-red-500 select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;"
+                >water_drop</span
+                >
+                </div>
+                </div>
+              </div>
+              {% endfor %}
+              {% else %}
+              <p class=" font-semibold">No rejected donations</p>
+              {% endif %}
+              
+              </div>
+          </div>
+          <div
+              class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            >
+              <h2 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-8">Fulfilled Requests</h2>
+              <div class="space-y-4" style="height: 200px; overflow-y: auto;">
+                {% if fulfilled%}
+              {% for donation in fulfilled %}
+              <div
+                class="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                onclick="window.location.href='{% url 'donation_request_summary' donation.id %}'"
+              >
+                <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                <span class="material-symbols-outlined text-red-500 select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;"
+                >favorite</span
+                >
+                <span class="ml-2 font-medium">&nbsp;Blood Type: &nbsp;&nbsp;&nbsp;&nbsp;<span class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-sm">{{ donation.blood_group}}</span></span>
+                </div>
+                <span class="text-sm ">{{ donation.request_datetime|date:"Y-m-d H:i"}}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                <p class="mt-2 text-sm   font-semibold">
+                 &nbsp;&nbsp;{{ donation.blood_bank.organization_name|upper }} BLOOD BANK
+                </p>
+                <div class="flex items-center">
+                <p class="mt-2 text-sm   font-semibold">
+                &nbsp;&nbsp; Donated Amount : {{ donation.requested_amount }} ml  
+                </p>
+                <span class=" mt-2 material-symbols-outlined text-red-500 select-none animate-pulse" style="font-variation-settings: 'FILL' 1; user-select: none; -webkit-user-select: none;"
+                >water_drop</span
+                >
+                </div>
+                </div>
+              </div>
+              {% endfor %}
+              {% else %}
+              <p class=" font-semibold">No fulfilled requests</p>
+              {% endif %}
+              
+              </div>
+          </div>
+        </main>
+        <footer class="mt-16 bg-black border-t" style="border-radius: 30px;">
+          <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div class="space-y-4">
+                <h3
+                  class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-pink-600"
+                >
+                  RedRespond
+                </h3>
+                <p class="text-gray-400">
+                  Connecting donors with those in need, one donation at a time.
+                </p>
+              </div>
+              <div class="space-y-4">
+                <h4 class="font-semibold text-white">Quick Links</h4>
+                <ul class="space-y-2">
+                  <li>
+                    <a
+                      href="#"
+                      class="text-gray-400 hover:text-red-600 transition-colors duration-300"
+                      >About Us</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="text-gray-400 hover:text-red-600 transition-colors duration-300"
+                      >Contact</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="text-gray-400 hover:text-red-600 transition-colors duration-300"
+                      >FAQ</a
+                    >
+                  </li>
+                </ul>
+              </div>
+              <div class="space-y-4">
+                <h4 class="font-semibold text-white">Legal</h4>
+                <ul class="space-y-2">
+                  <li>
+                    <a
+                      href="#"
+                      class="text-gray-400 hover:text-red-600 transition-colors duration-300"
+                      >Privacy Policy</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="text-gray-400 hover:text-red-600 transition-colors duration-300"
+                      >Terms of Service</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="text-gray-400 hover:text-red-600 transition-colors duration-300"
+                      >Cookie Policy</a
+                    >
+                  </li>
+                </ul>
+              </div>
+              <div class="space-y-4">
+                <h4 class="font-semibold text-white">Connect With Us</h4>
+                <div class="flex space-x-4">
+                  <span
+                    class="material-symbols-outlined text-gray-400 cursor-pointer hover:text-red-600 transition-colors duration-300"
+                    >facebook</span
+                  >
+                  <span
+                    class="material-symbols-outlined text-gray-400 cursor-pointer hover:text-red-600 transition-colors duration-300"
+                    >mail</span
+                  >
+                  <span
+                    class="material-symbols-outlined text-gray-400 cursor-pointer hover:text-red-600 transition-colors duration-300"
+                    >phone_in_talk</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div
+              class="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400"
+            >
+              <p>© 2024 RedRespond . All rights reserved.</p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <script>
+        function updateTime() {
+            const now = new Date();
+            
+            // Get the current time
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const formattedTime = hours + ':' + minutes + ':' + seconds+ "  ,   ";
+    
+            // Get the current date
+            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const monthsOfYear = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+            const dayOfWeek = daysOfWeek[now.getDay()];
+            const month = monthsOfYear[now.getMonth()];
+            const day = now.getDate().toString().padStart(2, '0');
+            const year = now.getFullYear();
+            const formattedDate = `    ${dayOfWeek} ,  ${month}  ${day} ,  ${year} `;
+    
+            // Update both date and time on the page
+            document.getElementById('time').textContent = formattedTime;
+            document.getElementById('date').textContent = formattedDate;
+        }
+    
+        setInterval(updateTime, 1000); // Update every second
+    </script>
+    
+  </body>
+</html>
